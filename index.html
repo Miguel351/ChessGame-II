@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Satranç - Kontrol Kareleri</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Satranç Antrenman Tahtası</h1>
+    <p class="subtitle">Taşların kontrol ettiği kareleri görerek pozisyonu analiz edin</p>
+  </header>
+
+  <main>
+    <div class="left-column">
+      <aside class="panel left-panel">
+        <div id="status" class="status"></div>
+
+        <label class="toggle">
+          <input type="checkbox" id="controlMapToggle">
+          <span>Tüm Kontrol Haritasını Göster</span>
+        </label>
+
+        <div class="legend">
+          <div class="legend-item"><span class="swatch selected-swatch"></span> Seçili taş</div>
+          <div class="legend-item"><span class="swatch legal-swatch"></span> Geçerli hamle</div>
+          <div class="legend-item"><span class="swatch capture-swatch"></span> Alınabilir taş</div>
+          <div class="legend-item"><span class="swatch controlled-swatch"></span> Seçili taşın kontrol ettiği kareler</div>
+          <label class="legend-item legend-toggle">
+            <input type="checkbox" id="showControlWhite" checked>
+            <span class="swatch control-white-swatch"></span> Sadece beyaz kontrolü
+          </label>
+          <label class="legend-item legend-toggle">
+            <input type="checkbox" id="showControlBlack" checked>
+            <span class="swatch control-black-swatch"></span> Sadece siyah kontrolü
+          </label>
+          <label class="legend-item legend-toggle">
+            <input type="checkbox" id="showControlBoth" checked>
+            <span class="swatch control-both-swatch"></span> Her iki taraf da kontrol ediyor
+          </label>
+          <div class="legend-item"><span class="swatch check-swatch"></span> Şah çekiliyor</div>
+        </div>
+
+
+
+        <button id="resetBtn">Yeni Oyun</button>
+      </aside>
+
+      <aside class="panel stats-panel">
+        <h3>İstatistikler</h3>
+        <div class="stats-row">Beyazın kontrol ettiği kare sayısı: <span id="statWhiteControlled">0</span></div>
+        <div class="stats-row">Siyahın kontrol ettiği kare sayısı: <span id="statBlackControlled">0</span></div>
+              <div class="captured">
+          <div class="captured-row"><strong>Beyazın aldığı taşlar:</strong> <span id="capturedByWhite"></span></div>
+          <div class="captured-row"><strong>Siyahın aldığı taşlar:</strong> <span id="capturedByBlack"></span></div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="board-wrapper">
+      <div class="files-labels top">
+        <span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span>
+      </div>
+      <div class="board-row">
+        <div class="ranks-labels">
+          <span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span>
+        </div>
+        <div id="board" class="board"></div>
+      </div>
+    </div>
+
+    <aside class="panel right-panel">
+      <h3>Hamle Listesi</h3>
+      <ol id="moveList" class="move-list"></ol>
+    </aside>
+  </main>
+</div>
+
+<div id="promoModal" class="modal hidden">
+  <div class="modal-content">
+    <p>Terfi edecek taşı seçin:</p>
+    <div id="promoChoices" class="promo-choices"></div>
+  </div>
+</div>
+
+<script src="engine.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

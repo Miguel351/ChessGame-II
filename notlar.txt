@@ -1,0 +1,35 @@
+Değiştirmen gereken 4 yer (hepsinde aynı değeri kullanman görsel tutarlılık için mantıklı):
+
+.square.controlled::before (satır ~93-99) — seçili taşın kontrol ettiği kareler
+.square.control-white::before (satır ~126-131)
+.square.control-black::before (satır ~133-138)
+.square.control-both::before (satır ~140-145)
+
+.control-badge.control-white { background: rgba(0, 66, 181, 0.55); }
+.control-badge.control-black { background: rgba(7, 212, 38, 0.55); }
+.control-badge.control-both { background: rgba(185, 0, 0, 0.55); }
+
+
+Tahtayı %25 büyütmek için oynaman gereken temel satırlar (56px kare boyutunun geçtiği her yer, 56 × 1.25 = 70px yapman yeterli):
+
+Satır	Şu an	%25 büyük
+style.css:53 .files-labels grid-template-columns	repeat(8, 56px)	repeat(8, 70px)
+style.css:54 .files-labels margin-left	24px	30px
+style.css:62 .ranks-labels grid-template-rows	repeat(8, 56px)	repeat(8, 70px)
+style.css:63 .ranks-labels width	24px	30px
+style.css:69-70 .board grid-template-columns/rows	repeat(8, 56px)	repeat(8, 70px)
+style.css:79 .square font-size (taş sembol boyutu)	2.2rem	2.75rem
+İsteğe bağlı (kareyle orantılı kalsın istersen):
+
+style.css:105-106 legal-move noktası 18px → 22px
+style.css:306-307 terfi modalındaki taş butonları 56px → 70px
+
+
+Taş görsellerinin boyutunu style.css:203-214 içindeki iki kuraldan ayarlıyorsun:
+
+style.css:203-209 .piece-img → tüm taşların genel boyutu (kare alanının yüzdesi olarak). 
+Şu an %82. Büyütmek için artır (%90 gibi), küçültmek için azalt.
+style.css:211-214 .piece-img.piece-img-p → sadece piyonlar için ek küçültme 
+(şu an genel boyutun %80'i, yani %65.6).
+İkisi de kare (.square) boyutuna göre yüzde (%) olarak hesaplanıyor, yani tahta büyüklüğü değişse 
+bile oranlar aynı kalır — parametrik olan kısım tam olarak bu iki width/height yüzdesi.
