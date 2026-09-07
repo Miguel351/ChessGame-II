@@ -44,7 +44,7 @@ class StockfishEngine {
 
   // Verilen FEN pozisyonunu değerlendirir; dönen skor FEN'deki sıradaki tarafın perspektifindedir.
   // Motor tek seferde tek istek işleyebildiği için çağrılar kuyruklanır (öncekiler bitmeden düşürülmez).
-  evaluateFEN(fen, { movetime = 300 } = {}) {
+  evaluateFEN(fen, { movetime = 300, depth = 18 } = {}) {
     if (!this.available) return Promise.resolve(null);
     const run = async () => {
       await this.ready;
@@ -69,7 +69,8 @@ class StockfishEngine {
         };
         this.worker.addEventListener('message', onMessage);
         this.worker.postMessage('position fen ' + fen);
-        this.worker.postMessage('go movetime ' + movetime);
+        // movetime + depth birlikte: hangisi önce dolarsa arama orada durur (depth 50 gibi süresiz beklemeyi engeller).
+        this.worker.postMessage('go movetime ' + movetime + ' depth ' + depth);
       });
     };
     this.queue = this.queue.then(run, run);
