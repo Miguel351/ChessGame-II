@@ -551,8 +551,8 @@ function render() {
         sq.classList.add(isCapture ? 'legal-capture' : 'legal-move');
         if (legalMatch.evalScore !== undefined) {
           const closeToBest = bestEvalScore !== null && bestEvalScore - legalMatch.evalScore <= EVAL_MARGIN_CP;
-          if (legalMatch.evalScore <= EVAL_BAD_CP) sq.classList.add('eval-bad');
-          else if (legalMatch.evalScore >= EVAL_GOOD_CP || closeToBest) sq.classList.add('eval-good');
+          if (closeToBest || legalMatch.evalScore >= EVAL_GOOD_CP) sq.classList.add('eval-good');
+          else if (legalMatch.evalScore <= EVAL_BAD_CP) sq.classList.add('eval-bad');
         }
       }
       if (showControlMap) {

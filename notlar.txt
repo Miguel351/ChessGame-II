@@ -33,3 +33,19 @@ style.css:211-214 .piece-img.piece-img-p → sadece piyonlar için ek küçültm
 (şu an genel boyutun %80'i, yani %65.6).
 İkisi de kare (.square) boyutuna göre yüzde (%) olarak hesaplanıyor, yani tahta büyüklüğü değişse 
 bile oranlar aynı kalır — parametrik olan kısım tam olarak bu iki width/height yüzdesi.
+
+http://localhost:5500/index.html
+cd "E:\__Drive F\_Backups and years\Portfolio\__AI destekli Programlarım\ChessGame II"
+python -m http.server 5500
+Sonra tarayıcıda http://localhost:5500/index.html açın.
+
+??? stockfish daha derin analiz yapsın diye denemeler yapmak istesem hangi parametreleri kodda değiştirmem gerek ???
+
+Derinliği etkileyen üç yer var:
+1)
+const score = await stockfishEngine.evaluateFEN(fen, { movetime: 300 });
+Bu, motorun her hamle için ne kadar süre (ms) düşüneceğini belirler. 300 yerine 1000, 2000 gibi bir değer verirseniz motor daha derin arama yapar ama:
+
+Seçili taşın her hedef karesi ayrı ayrı sıraya girdiği için (kuyruklama engine.js içinde), toplam bekleme süresi = movetime × hedef kare sayısı olur. Örneğin bir vezirin 20 hedefi varsa 1000ms ile 20 saniye sürer.
+
+2)
