@@ -310,11 +310,12 @@ function isInCheck(state, color) {
   return isSquareAttackedBy(state.board, kingPos.r, kingPos.c, opp(color));
 }
 
-// Standart satranç notasyonu (SAN): sadece hedef kare + gerektiğinde belirsizlik giderme (dosya/sıra).
+// Türkçe satranç notasyonu (SAN benzeri): piyon yok, diğer taşlar A/F/K/V/Ş.
 function moveNotation(state, move, piece, captured) {
   if (move.castle === 'K') return 'O-O';
   if (move.castle === 'Q') return 'O-O-O';
-  const letters = { p: '', n: 'N', b: 'B', r: 'R', q: 'Q', k: 'K' };
+  const letters = { p: '', n: 'A', b: 'F', r: 'K', q: 'V', k: 'Ş' };
+  const promoLetters = { q: 'V', r: 'K', b: 'F', n: 'A' };
   const toSq = squareName(move.to.r, move.to.c);
   const isCapture = !!captured || move.isEnPassant;
   let s = '';
@@ -340,7 +341,7 @@ function moveNotation(state, move, piece, captured) {
 
   if (isCapture) s += 'x';
   s += toSq;
-  if (move.promotion) s += '=' + { q: 'Q', r: 'R', b: 'B', n: 'N' }[move.promotion];
+  if (move.promotion) s += '=' + promoLetters[move.promotion];
   return s;
 }
 
@@ -453,6 +454,55 @@ function finalizeMove(move) {
     last.notation += game.status === 'checkmate' ? '#' : '+';
   }
   render();
+  evaluatePosition();
+}
+
+// Lichess'in win-chance formülüne benzer bir sıkıştırma: uç cp değerlerinde çubuk %0/%100'e yaklaşır ama katılaşmaz.
+function cpToWhitePercent(cp) {
+  const winChance = 2 / (1 + Math.exp(-0.00368208 * cp)) - 1; // -1..1
+  return 50 + 50 * winChance;
+}
+
+let positionEvalGeneration = 0;
+
+// Sırası gelen tarafa göre değil, her zaman beyaz perspektifine göre güncellenen genel durum çubuğu.
+async function evaluatePosition() {
+  positionEvalGeneration++;
+  const generation = positionEvalGeneration;
+  if (!stockfishEngine.available) {
+    updateEvalBar(null);
+    return;
+  }
+  const sideToMove = game.turn;
+  const fen = boardToFEN(game.board, sideToMove, game.castling, game.enPassant, game.fullmoveNumber);
+  const score = await stockfishEngine.evaluateFEN(fen, { movetime: 300 });
+  if (generation !== positionEvalGeneration) return; // pozisyon değişti, eski sonucu at
+  if (!score) { updateEvalBar(null); return; }
+
+  if (score.mate !== undefined) {
+    const mateForWhite = sideToMove === 'w' ? score.mate : -score.mate;
+    updateEvalBar({ mate: mateForWhite });
+  } else {
+    const cpForWhite = sideToMove === 'w' ? score.cp : -score.cp;
+    updateEvalBar({ cp: cpForWhite });
+  }
+}
+
+function updateEvalBar(result) {
+  let whitePercent = 50;
+  let label = '0.0';
+  if (result && result.mate !== undefined) {
+    whitePercent = result.mate > 0 ? 99 : 1;
+    label = 'M' + Math.abs(result.mate);
+  } else if (result && result.cp !== undefined) {
+    whitePercent = cpToWhitePercent(result.cp);
+    const pawns = (result.cp / 100).toFixed(1);
+    label = result.cp > 0 ? '+' + pawns : pawns;
+  }
+  whitePercent = Math.min(99, Math.max(1, whitePercent));
+  evalBarWhiteEl.style.height = whitePercent + '%';
+  evalBarBlackEl.style.height = (100 - whitePercent) + '%';
+  evalScoreLabelEl.textContent = label;
 }
 
 function onSquareClick(r, c) {
@@ -519,6 +569,9 @@ const showControlBlackToggle = document.getElementById('showControlBlack');
 const showControlBothToggle = document.getElementById('showControlBoth');
 const statWhiteControlledEl = document.getElementById('statWhiteControlled');
 const statBlackControlledEl = document.getElementById('statBlackControlled');
+const evalBarWhiteEl = document.getElementById('evalBarWhite');
+const evalBarBlackEl = document.getElementById('evalBarBlack');
+const evalScoreLabelEl = document.getElementById('evalScoreLabel');
 
 function render() {
   boardEl.innerHTML = '';
@@ -640,3 +693,4 @@ showControlWhiteToggle.addEventListener('change', render);
 showControlBlackToggle.addEventListener('change', render);
 showControlBothToggle.addEventListener('change', render);
 newGame();
+evaluatePosition();
